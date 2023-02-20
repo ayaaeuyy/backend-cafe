@@ -15,6 +15,7 @@ app.post("/add", userController.addUser)
 app.post("/find", userController.searchUser)
 app.put("/:id_user", userController.updateUser)
 app.delete("/:id_user", userController.deleteUser)
+app.post("/:auth", userController.authentication)
 
 // export app in order to load in another file
 module.exports = app

@@ -1,5 +1,7 @@
 // load model for user table
 const userModel = require('../models/index').users
+let md5 = require("md5")
+let jwt = require('jsonwebtoken')
 
 // load operation from Sequelize
 const Op = require('sequelize').Op
@@ -51,7 +53,7 @@ exports.searchUser = async (request, response) => {
     let users = await userModel.findAll({
         where: {
             [Op.or]: [
-                { username: { [Op.substring]: keyword }},
+                { username: { [Op.substring]: keyword } },
                 { role: { [Op.substring]: keyword } }
             ]
         }
@@ -70,7 +72,7 @@ exports.addUser = (request, response) => {
         nama_user: request.body.nama_user,
         role: request.body.role,
         username: request.body.username,
-        password: request.body.password
+        password: md5(request.body.password)
     }
 
     // execute inserting data to user's table
@@ -99,29 +101,29 @@ exports.updateUser = (request, response) => {
         nama_user: request.body.nama_user,
         role: request.body.role,
         username: request.body.username,
-        password: request.body.password
+        password: md5(request.body.password)
     }
 
     // define id user that will be update
     let idUser = request.params.id_user
 
     // execute update data based on defined id member
-    userModel.update(dataUser, {where: {id_user: idUser} })
-    .then(result => {
-        // if update's process success
-        return response.json({
-            success: true,
-            data:dataUser,
-            message: 'Data user has been updated'
+    userModel.update(dataUser, { where: { id_user: idUser } })
+        .then(result => {
+            // if update's process success
+            return response.json({
+                success: true,
+                data: dataUser,
+                message: 'Data user has been updated'
+            })
         })
-    })
-    .catch(error =>{
-        // if update's process fail
-        return response.json({
-            success: false,
-            message: error.message
+        .catch(error => {
+            // if update's process fail
+            return response.json({
+                success: false,
+                message: error.message
+            })
         })
-    })
 }
 
 // create function to delete data
@@ -130,18 +132,59 @@ exports.deleteUser = (request, response) => {
     let idUser = request.params.id_user
 
     // execute delete data based on defined id user
-    userModel.destroy({ where: { id_user: idUser }})
-    .then(result => {
-        return response.json({
-            success: true,
-            message: 'Data user has been updated'
+    userModel.destroy({ where: { id_user: idUser } })
+        .then(result => {
+            return response.json({
+                success: true,
+                message: 'Data user has been updated'
+            })
         })
-    })
-    .catch(error => {
-        // if update's process fail
-        return response.json({
-            success: false,
-            message: error.message
+        .catch(error => {
+            // if update's process fail
+            return response.json({
+                success: false,
+                message: error.message
+            })
         })
-    })
+}
+
+exports.authentication = async (request, response) => {
+    let data = {
+        username: request.body.username,
+        password: md5(request.body.password)
+    }
+
+    // validasi (cek data di tabel user)
+    let result = await userModel.findOne({ where: data })
+
+    if (result) {
+        // data ditemukan
+
+        // payload adalah data/informasi yang akan dienkripsi
+        let payload = {
+            username: result.username,
+            password: result.password
+        }
+
+        let secretKey = "secret key"
+        let options = {
+            expiresIn: "30m"
+        }
+
+        // generate token
+        let token = jwt.sign(payload, secretKey, options)
+
+        return response.json({
+            logged: true,
+            token: token,
+            dataUser: result
+        })
+    } else {
+        // data tidak ditemukan
+        return response.json({
+            data: result,
+            logged: false,
+            message: "Data Not Found"
+        })
+    }
 }
