@@ -4,14 +4,8 @@ const mejaModel = require('../models/index').meja
 // load operation from Sequelize
 const Op = require('sequelize').Op
 
-//import auth
-const auth = require("../auth")
-// app.use(auth)
-
-// TODO export sekali aja
-// create function for read all data
+// get all data
 exports.getAllMeja = async (request, response) => {
-    // call findAll() to get all data
     try {
         let mejas = await mejaModel.findAll();
         response.json({
@@ -24,6 +18,7 @@ exports.getAllMeja = async (request, response) => {
     }
 }
 
+// get data by id
 exports.getOneMeja = async (request, response) => {
     try {
         let mejas = await mejaModel.findAll({
@@ -41,13 +36,10 @@ exports.getOneMeja = async (request, response) => {
     }
 }
 
-// create function for filter
+// filter data by keyword
 exports.searchMeja = async (request, response) => {
     // define keyword to find data
     let keyword = request.body.keyword
-
-    // call findAll() within where clause and
-    // operation to find data based on keyword
     let mejas = await mejaModel.findAll({
         where: {
             [Op.or]: [
@@ -63,7 +55,7 @@ exports.searchMeja = async (request, response) => {
     })
 }
 
-// create function for add new meja
+// add data
 exports.addMeja = (request, response) => {
     // prepare data from request
     let newMeja = {
@@ -74,7 +66,7 @@ exports.addMeja = (request, response) => {
     // execute inserting data to meja's table
     mejaModel.create(newMeja)
         .then(result => {
-            // if inser's process success
+            // if insert's process success
             return response.json({
                 success: true,
                 data: result,
@@ -90,7 +82,7 @@ exports.addMeja = (request, response) => {
         })
 }
 
-// create function for update member
+// update data
 exports.updateMeja = (request, response) => {
     // prepare data that has been changed
     let dataMeja = {
@@ -120,7 +112,7 @@ exports.updateMeja = (request, response) => {
     })
 }
 
-// create function to delete data
+// delete data
 exports.deleteMeja = (request, response) => {
     // define id meja that will be update
     let idMeja = request.params.id_meja

@@ -6,9 +6,6 @@ let jwt = require('jsonwebtoken')
 // load operation from Sequelize
 const Op = require('sequelize').Op
 
-//import auth
-const auth = require("../auth")
-// app.use(auth)
 
 // TODO export sekali aja
 // create function for read all data
@@ -153,38 +150,25 @@ exports.authentication = async (request, response) => {
         username: request.body.username,
         password: md5(request.body.password)
     }
-
-    // validasi (cek data di tabel user)
-    let result = await userModel.findOne({ where: data })
-
+    //validasi (cek data di tabel user)
+    let result = await userModel.findOne({where: data})
     if (result) {
         // data ditemukan
-
-        // payload adalah data/informasi yang akan dienkripsi
-        let payload = {
-            username: result.username,
-            password: result.password
-        }
-
-        let secretKey = "secret key"
-        let options = {
-            expiresIn: "30m"
-        }
-
+        // payload = data/informasi yg akan dienkripsi
+        let payload = JSON.stringify(result) // koversi bentuk objek -> JSON
+        let secretKey = `Sequelize itu sangat menyenangkan`
         // generate token
-        let token = jwt.sign(payload, secretKey, options)
-
+        let token = jwt.sign(payload, secretKey)
         return response.json({
             logged: true,
             token: token,
             dataUser: result
         })
-    } else {
+    } else{
         // data tidak ditemukan
         return response.json({
-            data: result,
             logged: false,
-            message: "Data Not Found"
-        })
-    }
+            message: `Invalid username or password`
+        })
+    }
 }

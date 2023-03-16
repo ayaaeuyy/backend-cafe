@@ -13,12 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.users, {
         foreignKey: "id_user",
-        as: "users"
+        onDelete: "CASCADE", // Add this line to enable delete on cascade
       })
 
       this.belongsTo(models.meja, {
         foreignKey: "id_meja",
-        as: "meja"
+        onDelete: "CASCADE", // Add this line to enable delete on cascade   
       })
 
       this.hasMany(models.detail_transaksi, {
@@ -36,10 +36,27 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
     tgl_transaksi: DataTypes.DATE,
-    id_user: DataTypes.INTEGER,
-    id_meja: DataTypes.INTEGER,
+    id_user: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "user",
+        key: "id_user",
+      },
+      onDelete: "CASCADE",
+    },
+    id_meja: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "meja",
+        key: "id_meja",
+      },
+      onDelete: "CASCADE",
+    },
     nama_pelanggan: DataTypes.STRING,
-    status: DataTypes.STRING
+    status: DataTypes.ENUM("belum_bayar", "lunas"),
+    total: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'transaksi',

@@ -6,11 +6,9 @@ const Op = require(`sequelize`).Op
 const path = require(`path`)
 const fs = require(`fs`)
 
-//import auth
-const auth = require("../auth")
-// app.use(auth)
 
-/** create function to read all data */
+
+// get all data
 exports.getAllMenu = async (request, response) => {
     /** call findAll() to get all data */
     try {
@@ -24,6 +22,8 @@ exports.getAllMenu = async (request, response) => {
         console.log(err);
     }
 }
+
+//get data by id
 exports.getOneMenu = async (request, response) => {
     try {
         let menu = await menuModel.findAll({
@@ -40,7 +40,8 @@ exports.getOneMenu = async (request, response) => {
         console.log(err);
     }
 }
-/** create function for filter */
+
+// search data
 exports.findMenu = async (request, response) => {
     /** define keyword to find data */
     let keyword = request.body.keyword
@@ -68,8 +69,7 @@ exports.findMenu = async (request, response) => {
 */
 const upload = require(`./upload-image`).single(`image`)
 
-/** create function to add new menu */
-
+// add data
 exports.addMenu = (request, response) => {
     /** run function upload */
     upload(request, response, async error => {
@@ -113,7 +113,7 @@ exports.addMenu = (request, response) => {
     })
 }
 
-/** create function to update menu */
+//update data 
 exports.updateMenu = async (request, response) => {
     /** run upload function */
     upload(request, response, async error => {
@@ -122,7 +122,7 @@ exports.updateMenu = async (request, response) => {
             return response.json({ message: error })
         }
         /** store selected menu ID that will update */
-        let id = request.params.id
+        let id = request.params.id_menu
         /** prepare menu's data that will update */
         let menu = {
             nama_menu: request.body.nama_menu,
@@ -136,7 +136,7 @@ exports.updateMenu = async (request, response) => {
         if (request.file) {
             /** get selected menu's data */
             const selectedMenu = await menuModel.findOne({
-                where: { id: id_menu }
+                where: { id_menu:id }
             })
             /** get old filename of image file */
             const oldImageMenu = selectedMenu.image
@@ -171,13 +171,13 @@ exports.updateMenu = async (request, response) => {
     })
 }
 
-/** create function to delete menu */
+//delete data
 exports.deleteMenu = async (request, response) => {
     /** store selected menu's ID that will be delete */
-    const id = request.params.id
+    const idMenu = request.params.id_menu
     /** -- delete image file -- */
     /** get selected menu's data */
-    const menu = await menuModel.findOne({ where: { id: id } })
+    const menu = await menuModel.findOne({ where: { id_menu: idMenu } })
     /** get old filename of image file */
     const oldImageMenu = menu.image
     /** prepare path of old image to delete file */
@@ -191,7 +191,7 @@ exports.deleteMenu = async (request, response) => {
     /** -- end of delete image file -- */
 
     /** execute delete data based on defined id menu */
-    menuModel.destroy({ where: { id: id } })
+    menuModel.destroy({ where: { id_menu: idMenu } })
         .then(result => {
             /** if update's process success */
             return response.json({
@@ -207,28 +207,8 @@ exports.deleteMenu = async (request, response) => {
             })
         })
     }
-        // create function to delete data
-exports.deleteMenu = (request, response) => {
-    // define id user that will be update
-    let idMenu = request.params.id_menu
 
-    // execute delete data based on defined id user
-    menuModel.destroy({ where: { id_menu: idMenu }})
-    .then(result => {
-        return response.json({
-            success: true,
-            message: 'Data menu has been updated'
-        })
-    })
-    .catch(error => {
-        // if update's process fail
-        return response.json({
-            success: false,
-            message: error.message
-        })
-    })
-}
-// create function for filter
+// filter by keyword
 exports.searchMenu = async (request, response) => {
     // define keyword to find data
     let keyword = request.body.keyword

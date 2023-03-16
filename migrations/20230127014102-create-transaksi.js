@@ -32,6 +32,9 @@ module.exports = {
       status: {
         type: Sequelize.ENUM('belum_bayar','lunas')
       },
+      total:{
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

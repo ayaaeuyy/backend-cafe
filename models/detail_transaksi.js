@@ -22,20 +22,41 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
   }
-  detail_transaksi.init({
-    id_detail_transaksi:{
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+  detail_transaksi.init(
+    {
+      id_detail_transaksi: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      id_transaksi: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "transaksi",
+          key: "id_transaksi",
+        },
+        onDelete: "CASCADE",
+      },
+      id_menu: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "menu",
+          key: "id_menu",
+        },
+        onDelete: "CASCADE",
+      },
+      qty: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
-    id_transaksi: DataTypes.INTEGER,
-    id_menu: DataTypes.INTEGER,
-    harga: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'detail_transaksi',
-    tableName: 'detail_transaksi',
-    freezeTableName: true
-  });
+    {
+      sequelize,
+      modelName: "detail_transaksi",
+      freezeTableName: true,
+    }
+  );
   return detail_transaksi;
 };

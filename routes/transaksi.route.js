@@ -7,18 +7,20 @@ const app = express()
 app.use(express.json())
 
 /** load transaksi's controller */
-const transaksiController =
-require(`../controllers/transaksi.controller.js`)
-
+const transaksiController = require(`../controllers/transaksi.controller.js`)
+let authorization = require(`../middlewares/authorization`)
 /** create route to add new transaksi book */
-app.post("/", transaksiController.addTransaksi)
+app.post("/add",[authorization.authorization], transaksiController.addTransaksi)
 /** create route to update transaksi book based on ID */
-app.put("/update/:id", transaksiController.updateTransaksi)
+app.put("/update/:id", [authorization.authorization],transaksiController.updateTransaksi)
 /** create toute to delete transaksi book based on ID */
-app.delete("/:id", transaksiController.deleteTransaksi)
+app.delete("/:id", [authorization.authorization],transaksiController.deleteTransaksi)
 /** create route to return book */
-app.get("/return/:id", transaksiController.returnMenu)
+
 /** create route to get all transaksi book */
-app.get("/", transaksiController.getTransaksi)
+app.get("/", [authorization.authorization],transaksiController.getTransaksi)
+app.post("/date", [authorization.authorization],transaksiController.filterTransaksi)
+app.post("/find", [authorization.authorization],transaksiController.findTransaksi)
+app.put("/pay/:id_transaksi", [authorization.authorization],transaksiController.createPayment)
 /** export app in order to load in another file */
 module.exports = app
